@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections;
 using TANFInterfaces.Contracts;
 using TANFModels.GenericModelElements;
 using TANFModels.Models;
@@ -18,6 +16,7 @@ namespace ADDITANFWebAPIS.Controllers
             _lookupService = lookupService;
         }
         //Get/getIdentityName
+        [AllowAnonymous]
         [HttpGet("getIdentityName")]
         public async Task<IEnumerable<Users>> getIdentityName()
         {
