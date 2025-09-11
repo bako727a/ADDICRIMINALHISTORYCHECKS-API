@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TANFInterfaces.Contracts;
 using TANFModels.enums;
@@ -7,8 +9,8 @@ using TANFModels.Models;
 
 namespace ADDITANFWebAPIS.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class CaseManagementController : ControllerBase
     {
         private readonly ICaseManagementService _caseManagement;
@@ -24,10 +26,12 @@ namespace ADDITANFWebAPIS.Controllers
             _securityService = securityService;
         }
         //Post/Search
-        [HttpPost("casemanagementsearch")]
-        public async Task<GridResult<AdvanceSearchViewModel>> Search(CaseManagementSearchCriteria criteria)
+        [HttpPost]
+        [Route("casemanagementsearch")]
+        public async Task<GridResult<AdvanceSearchViewModel>> casemanagementsearch([FromBody] CaseManagementSearchCriteria criteria)
         {
-            var UserInformation = _lookupService.GetUserList(User.Identity.Name.Replace("DHRAL\\", ""), 0).Result.FirstOrDefault();
+            string windowsUser = Environment.UserName;
+            var UserInformation = _lookupService.GetUserList(windowsUser, 0).Result.FirstOrDefault();
             criteria.isConfidentialAllowed = UserInformation.RoleID == 3 || UserInformation.RoleID == 5 || UserInformation.RoleID == 6 || UserInformation.RoleID == 7;
             var UserCredentials = _securityService.GetUserEntitlements(UserInformation.ID);
             if (UserInformation.RoleID == (int)SecurityEnums.CountyDirector || UserInformation.RoleID == (int)SecurityEnums.CountySupervisor || UserInformation.RoleID == (int)SecurityEnums.CountyWorker)
@@ -64,6 +68,8 @@ namespace ADDITANFWebAPIS.Controllers
             criteria.LoginUserRoleID = UserInformation.RoleID;
             return await _caseManagement.Search(criteria);
         }
+
+
         //Get/documentrecordinfo
         [HttpGet("documentrecordinfo/{DocumentID}")]
         public async Task<Document> documentrecordinfo(int DocumentID)

@@ -10,7 +10,7 @@ namespace TANFModels.Models
     {
         public string CaseSSN { get; set; }
         public int? CountyID { get; set; }
-        public int CaseWorkerID { get; set; }
+        public int? CaseWorkerID { get; set; }
         public int? LoginUserRoleID { get; set; }
         public int PageSize { get; set; }
         public int PageIndex { get; set; }

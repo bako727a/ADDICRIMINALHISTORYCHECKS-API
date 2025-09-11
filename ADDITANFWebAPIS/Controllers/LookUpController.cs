@@ -16,11 +16,13 @@ namespace ADDITANFWebAPIS.Controllers
             _lookupService = lookupService;
         }
         //Get/getIdentityName
-        [AllowAnonymous]
         [HttpGet("getIdentityName")]
+        [AllowAnonymous]
         public async Task<IEnumerable<Users>> getIdentityName()
         {
-            return await _lookupService.GetUserList(User.Identity.Name.Replace("DHRAL\\", ""), 0);
+            string windowsUser = Environment.UserName;
+            string domainUser = $"{Environment.UserDomainName}\\{Environment.UserName}";
+            return await _lookupService.GetUserList(domainUser.Replace("DHRAL\\", ""), 0);
         }
 
         //Get/GetUserInfo
