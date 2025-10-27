@@ -31,22 +31,16 @@ namespace TANFRepo.Repos
             }
             IEnumerable<AdvanceSearchViewModel> list = new List<AdvanceSearchViewModel>();
             var parameters = new {
-                Type = criteria.IsUniqueSearch ? "IsUniqueSearch" : (criteria.CaseSSN != "" && criteria.CaseSSN != null ? "CaseNumber" : (criteria.DocumentNumber > 0 && criteria.DocumentNumber != null ? "DocumentNumber" : "IsAdvanceSearch")),
-                CaseSSN = criteria.CaseSSN == "string" ? null : criteria.CaseSSN,
-                UserID = criteria.CaseWorkerID == 0 ? null : criteria.CaseWorkerID,
-                CaseType = criteria.CaseType == 0 ? null : criteria.CaseType,
-                DocumentNumber = criteria.DocumentNumber,
-                LastName = criteria.LastName == "string" ? null : criteria.LastName,
-                FirstName = criteria.FirstName == "string" ? null : criteria.FirstName,
-                DOB = criteria.DOB,
-                CaseStatus = criteria.CaseStatus == "string" ? null : criteria.CaseStatus,
-                CaseWorkerID = criteria.CaseWorkerID == 0 ? null : criteria.CaseWorkerID,
-                LoginUserRoleID = criteria.LoginUserRoleID == 0 ? null : criteria.LoginUserRoleID,
-                CountyID = criteria.CountyID == 0 ? null : criteria.CountyID,
-                ReviewPeriod = criteria.ReviewDate == "string" ? null : criteria.ReviewDate,
-                DocumentType = criteria.DocumentTypeID == 0 ? null : criteria.DocumentTypeID,
-                DocumentSubType = criteria.DocumentSubTypeID == 0 ? null : criteria.DocumentSubTypeID,
-                isConfidentialAllowed = criteria.isConfidentialAllowed ? 'Y' : 'N'
+                Type = criteria.IsUniqueSearch
+                ? "IsUniqueSearch"
+                : (!string.IsNullOrEmpty(criteria.CaseSSN) && criteria.CaseSSN != "string"
+                    ? "CaseNumber"
+                    : (criteria.DocumentNumber.HasValue && criteria.DocumentNumber > 0
+                        ? "DocumentNumber"
+                        : "IsAdvanceSearch")),  
+             LastName = criteria.LastName == "string" ? null : criteria.LastName,
+             FirstName = criteria.FirstName == "string" ? null : criteria.FirstName,
+             CountyID = criteria.CountyID == 0 ? null : criteria.CountyID,             
             };
             await _connection.QueryAsync<AdvanceSearchViewModel>(
                 "[dbo].[USP_AdvancedSearch]",

@@ -8,9 +8,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TANFDataAccess\TANFDataAccess.csproj" />
-    <ProjectReference Include="..\TANFModels\TANFModels.csproj" />
-    <ProjectReference Include="..\TANFRepo\TANFRepo.csproj" />
+    <ProjectReference Include="..\TANFDataAccess\CCDataAccess.csproj" />
+    <ProjectReference Include="..\TANFModels\CCModels.csproj" />
+    <ProjectReference Include="..\TANFRepo\CCRepo.csproj" />
   </ItemGroup>
 
 </Project>

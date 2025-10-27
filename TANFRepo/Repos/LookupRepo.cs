@@ -38,7 +38,7 @@ namespace TANFRepo.Repos
             List<KeyValue> list = new List<KeyValue>();     
             var parameters = new
             {
-                Type = typeId
+                TypeId = typeId
             };
 
             return await _connection.QueryAsync<KeyValue>(

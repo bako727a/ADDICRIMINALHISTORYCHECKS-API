@@ -13,8 +13,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TANFDataAccess\TANFDataAccess.csproj" />
-    <ProjectReference Include="..\TANFModels\TANFModels.csproj" />
+    <ProjectReference Include="..\TANFDataAccess\CCDataAccess.csproj" />
+    <ProjectReference Include="..\TANFModels\CCModels.csproj" />
   </ItemGroup>
 
 </Project>

@@ -59,8 +59,7 @@ namespace ADDITANFWebAPIS.Controllers
             {
                 if (criteria.CountyID == null)
                 {
-                    //var CaseInformation = _advancedSearch.caserecordinfo(criteria.CaseSSN.ToInt());
-                    criteria.IsUniqueSearch = true;
+                    //var CaseInformation = _advancedSearch.caserecordinfo(criteria.CaseSSN.ToInt());                  
                     var CaseInformation = _advancedSearch.AdvancedSearch(criteria).Result.Data.FirstOrDefault();
                     if (CaseInformation != null)
                     {

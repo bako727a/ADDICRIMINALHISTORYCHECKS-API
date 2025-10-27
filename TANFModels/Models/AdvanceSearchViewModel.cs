@@ -9,11 +9,11 @@ namespace TANFModels.Models
     public class AdvanceSearchViewModel
     {
         public int CaseInfoID { get; set; }
-        public string CaseStatus { get; set; }
+        public string? CaseStatus { get; set; }
         public int CaseWorkerID { get; set; }
         public int CountyID { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
+        public string? FirstName { get; set; }
+        public string? LastName { get; set; }
         public string MiddleName { get; set; }
         public string Suffix { get; set; }
         public DateTime DateOfBirth { get; set; }
@@ -24,7 +24,7 @@ namespace TANFModels.Models
         public int AuditAssignedUserID { get; set; }
         public string CountyName { get; set; }
         public string SearchType { get; set; }
-        public string ReviewPeriod { get; set; }
+        public string? ReviewPeriod { get; set; }
         public int LoginUserID { get; set; }
         public int LoginUserRoleID { get; set; }
         public string UserCredentials { get; set; }

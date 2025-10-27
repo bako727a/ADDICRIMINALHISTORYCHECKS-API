@@ -9,7 +9,7 @@ namespace ADDITANFWebAPIS.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class AdvancedSearchController : ControllerBase
     {
         private readonly IAdvanceSearchService _advancedSearch;
@@ -21,11 +21,12 @@ namespace ADDITANFWebAPIS.Controllers
             _lookupService = lookupService;
             _securityService = securityService;
         }
-
+        string windowsUser = Environment.UserName;
         // POST: api/advsearch/
         [HttpPost("advsearch")]
         public GridResult<AdvanceSearchViewModel> Search(CaseAdvanceSearchCriteria criteria)
         {
+           
             if (criteria.ReviewPeriod != null)
             {
                 criteria.ReviewDate = criteria.ReviewPeriod.Value.ToShortDateString();
@@ -35,7 +36,7 @@ namespace ADDITANFWebAPIS.Controllers
             {
                 criteria.DateOfBirth = DateTime.MinValue;
             }
-            var UserInformation = _lookupService.GetUserList(User.Identity.Name.Replace("DHRAL\\", ""), 0).Result;
+            var UserInformation = _lookupService.GetUserList(windowsUser, 0).Result;
             criteria.isConfidentialAllowed = UserInformation.FirstOrDefault().RoleID == 3 || UserInformation.FirstOrDefault().RoleID == 5 || UserInformation.FirstOrDefault().RoleID == 6 || UserInformation.FirstOrDefault().RoleID == 7;
             var UserCredentials = _securityService.GetUserEntitlements(UserInformation.FirstOrDefault().ID);
             if (UserInformation.FirstOrDefault().RoleID == (int)SecurityEnums.CountyDirector || UserInformation.FirstOrDefault().RoleID == (int)SecurityEnums.CountySupervisor || UserInformation.FirstOrDefault().RoleID == (int)SecurityEnums.CountyWorker || UserInformation.FirstOrDefault().RoleID == (int)SecurityEnums.Clerical)
@@ -80,7 +81,7 @@ namespace ADDITANFWebAPIS.Controllers
             {
                 criteria.ReviewDate = criteria.ReviewPeriod.Value.ToShortDateString();
             }
-            var UserInformation = _lookupService.GetUserList(User.Identity.Name.Replace("DHRAL\\", ""), 0).Result;
+            var UserInformation = _lookupService.GetUserList(windowsUser, 0).Result;
             var UserCredentials = _securityService.GetUserEntitlements(UserInformation.FirstOrDefault().ID);
             criteria.isConfidentialAllowed = UserInformation.FirstOrDefault().RoleID == 3 || UserInformation.FirstOrDefault().RoleID == 5 || UserInformation.FirstOrDefault().RoleID == 6 || UserInformation.FirstOrDefault().RoleID == 7;
             if (UserInformation.FirstOrDefault().RoleID == (int)SecurityEnums.CountyDirector || UserInformation.FirstOrDefault().RoleID == (int)SecurityEnums.CountySupervisor || UserInformation.FirstOrDefault().RoleID == (int)SecurityEnums.CountyWorker || UserInformation.FirstOrDefault().RoleID == (int)SecurityEnums.Clerical)
@@ -127,7 +128,7 @@ namespace ADDITANFWebAPIS.Controllers
         public GridResult<AdvanceSearchViewModel> caserecordinfoList(int id)
         {
             CaseAdvanceSearchCriteria criteria = new CaseAdvanceSearchCriteria();
-            var UserInformation = _lookupService.GetUserList(User.Identity.Name.Replace("DHRAL\\", ""), 0).Result;
+            var UserInformation = _lookupService.GetUserList(windowsUser, 0).Result;
             criteria.isConfidentialAllowed = UserInformation.FirstOrDefault().RoleID == 3 || UserInformation.FirstOrDefault().RoleID == 5 || UserInformation.FirstOrDefault().RoleID == 6 || UserInformation.FirstOrDefault().RoleID == 7;
             var UserCredentials = _securityService.GetUserEntitlements(UserInformation.FirstOrDefault().ID);
             if (UserInformation.FirstOrDefault().RoleID == (int)SecurityEnums.CountyDirector || UserInformation.FirstOrDefault().RoleID == (int)SecurityEnums.CountySupervisor || UserInformation.FirstOrDefault().RoleID == (int)SecurityEnums.CountyWorker || UserInformation.FirstOrDefault().RoleID == (int)SecurityEnums.Clerical)

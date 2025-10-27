@@ -92,8 +92,7 @@ namespace ADDITANFWebAPIS.Controllers
         //Get/GetDocumentType
         [HttpGet("DocumentType")]
         public async Task<IEnumerable<KeyValue>> GetDocumentType()
-        {
-            string name = User.Identity.Name.Replace("DHRAL\\", "");
+        {            
             return await _lookupService.GetList("DocumentType", 0);
         }
         //Get/GetDocumentSubType
