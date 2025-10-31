@@ -21,8 +21,9 @@ namespace ADDICCWebAPIS.Controllers
         public async Task<IEnumerable<Users>> getIdentityName()
         {
             string windowsUser = Environment.UserName;
-            string domainUser = $"{Environment.UserDomainName}\\{Environment.UserName}";
-            return await _lookupService.GetUserList(domainUser.Replace("DHRAL\\", ""), 0);
+            //string domainUser = $"{Environment.UserDomainName}\\{Environment.UserName
+            string domainUser = User?.Identity?.Name;
+            return await _lookupService.GetUserList(windowsUser, 0);
         }
 
         //Get/GetUserInfo
