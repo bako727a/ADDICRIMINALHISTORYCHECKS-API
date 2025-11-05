@@ -4,6 +4,7 @@ using CCInterfaces.Contracts;
 using CCModels.enums;
 using CCModels.Helper;
 using CCModels.Models;
+using Azure.Identity;
 
 namespace ADDICCWebAPIS.Controllers
 {
@@ -15,18 +16,21 @@ namespace ADDICCWebAPIS.Controllers
         private readonly IAdvanceSearchService _advancedSearch;
         private readonly ILookupService _lookupService;
         private readonly ISecurityService _securityService;
-        public AdvancedSearchController(IAdvanceSearchService advancedSearch, ILookupService lookupService, ISecurityService securityService)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public AdvancedSearchController(IAdvanceSearchService advancedSearch, ILookupService lookupService, ISecurityService securityService, IHttpContextAccessor httpContextAccessor)
         {
             _advancedSearch = advancedSearch;
             _lookupService = lookupService;
             _securityService = securityService;
+            _httpContextAccessor = httpContextAccessor;
         }
-        string windowsUser = Environment.UserName;
+
         // POST: api/advsearch/
         [HttpPost("advsearch")]
         public GridResult<AdvanceSearchViewModel> Search(CaseAdvanceSearchCriteria criteria)
         {
-           
+            var winusername = _httpContextAccessor.HttpContext?.User?.Identity;
+            string windowsUser = winusername.Name.Replace("DHRAL\\", "");
             if (criteria.ReviewPeriod != null)
             {
                 criteria.ReviewDate = criteria.ReviewPeriod.Value.ToShortDateString();
@@ -36,7 +40,7 @@ namespace ADDICCWebAPIS.Controllers
             {
                 criteria.DateOfBirth = DateTime.MinValue;
             }
-            var UserInformation = _lookupService.GetUserList(windowsUser, 0).Result;
+            var UserInformation = _lookupService.GetUserList(windowsUser.Replace("\\DHRAL", ""), 0).Result;
             criteria.isConfidentialAllowed = UserInformation.FirstOrDefault().RoleID == 3 || UserInformation.FirstOrDefault().RoleID == 5 || UserInformation.FirstOrDefault().RoleID == 6 || UserInformation.FirstOrDefault().RoleID == 7;
             var UserCredentials = _securityService.GetUserEntitlements(UserInformation.FirstOrDefault().ID);
             if (UserInformation.FirstOrDefault().RoleID == (int)SecurityEnums.CountyDirector || UserInformation.FirstOrDefault().RoleID == (int)SecurityEnums.CountySupervisor || UserInformation.FirstOrDefault().RoleID == (int)SecurityEnums.CountyWorker || UserInformation.FirstOrDefault().RoleID == (int)SecurityEnums.Clerical)
@@ -66,7 +70,7 @@ namespace ADDICCWebAPIS.Controllers
             {
                 criteria.userCountyId = UserInformation.FirstOrDefault().CountyID;
                 criteria.CaseWorkerID = UserInformation.FirstOrDefault().ID;
-                criteria.LoginUserRoleID = Convert.ToInt32( UserInformation.FirstOrDefault().RoleID);
+                criteria.LoginUserRoleID = Convert.ToInt32(UserInformation.FirstOrDefault().RoleID);
             }
             criteria.DateOfBirth = Convert.ToDateTime(criteria.DOB);
             criteria.DateOfBirth = criteria.DateOfBirth.ToLocalTime();
@@ -77,6 +81,8 @@ namespace ADDICCWebAPIS.Controllers
         [HttpPost("importsearch")]
         public GridResult<AdvanceSearchViewModel> Importsearch(CaseAdvanceSearchCriteria criteria)
         {
+            var winusername = _httpContextAccessor.HttpContext?.User?.Identity;
+            string windowsUser = winusername.Name.Replace("DHRAL\\", "");
             if (criteria.ReviewPeriod != null)
             {
                 criteria.ReviewDate = criteria.ReviewPeriod.Value.ToShortDateString();
@@ -111,7 +117,7 @@ namespace ADDICCWebAPIS.Controllers
             {
                 criteria.userCountyId = UserInformation.FirstOrDefault().CountyID;
                 criteria.CaseWorkerID = UserInformation.FirstOrDefault().ID;
-                criteria.LoginUserRoleID =Convert.ToInt32( UserInformation.FirstOrDefault().RoleID);
+                criteria.LoginUserRoleID = Convert.ToInt32(UserInformation.FirstOrDefault().RoleID);
             }
             criteria.LoginUserID = UserInformation.FirstOrDefault().ID;
             criteria.LoginUserRoleID = Convert.ToInt32(UserInformation.FirstOrDefault().RoleID);
@@ -127,6 +133,8 @@ namespace ADDICCWebAPIS.Controllers
         [HttpGet("caserecordinfoList/{id}")]
         public GridResult<AdvanceSearchViewModel> caserecordinfoList(int id)
         {
+            var winusername = _httpContextAccessor.HttpContext?.User?.Identity;
+            string windowsUser = winusername.Name.Replace("DHRAL\\", "");
             CaseAdvanceSearchCriteria criteria = new CaseAdvanceSearchCriteria();
             var UserInformation = _lookupService.GetUserList(windowsUser, 0).Result;
             criteria.isConfidentialAllowed = UserInformation.FirstOrDefault().RoleID == 3 || UserInformation.FirstOrDefault().RoleID == 5 || UserInformation.FirstOrDefault().RoleID == 6 || UserInformation.FirstOrDefault().RoleID == 7;
@@ -158,7 +166,7 @@ namespace ADDICCWebAPIS.Controllers
             {
                 criteria.userCountyId = UserInformation.FirstOrDefault().CountyID;
                 criteria.CaseWorkerID = UserInformation.FirstOrDefault().ID;
-                criteria.LoginUserRoleID =Convert.ToInt32(UserInformation.FirstOrDefault().RoleID);
+                criteria.LoginUserRoleID = Convert.ToInt32(UserInformation.FirstOrDefault().RoleID);
             }
             return _advancedSearch.caserecordinfoList(id, criteria).Result;
         }

@@ -25,13 +25,20 @@ namespace ADDICCWebAPIS.Controllers
             _lookupService = lookupService;
             _securityService = securityService;
         }
+        [HttpOptions]
+        [Route("{*path}")]
+        public IActionResult Options()
+        {
+            return Ok();
+        }
         //Post/Search
+        [Authorize]
         [HttpPost]
         [Route("casemanagementsearch")]
         public async Task<GridResult<AdvanceSearchViewModel>> casemanagementsearch([FromBody] CaseManagementSearchCriteria criteria)
         {
-            string windowsUser = Environment.UserName;
-            var UserInformation = _lookupService.GetUserList(windowsUser, 0).Result.FirstOrDefault();
+            var windowsUser = HttpContext.User.Identity;
+            var UserInformation = _lookupService.GetUserList(windowsUser.Name.Replace("DHRAL\\", ""), 0).Result.FirstOrDefault();
             criteria.isConfidentialAllowed = UserInformation.RoleID == 3 || UserInformation.RoleID == 5 || UserInformation.RoleID == 6 || UserInformation.RoleID == 7;
             var UserCredentials = _securityService.GetUserEntitlements(UserInformation.ID);
             if (UserInformation.RoleID == (int)SecurityEnums.CountyDirector || UserInformation.RoleID == (int)SecurityEnums.CountySupervisor || UserInformation.RoleID == (int)SecurityEnums.CountyWorker)
@@ -74,7 +81,7 @@ namespace ADDICCWebAPIS.Controllers
         [HttpGet("documentrecordinfo/{DocumentID}")]
         public async Task<Document> documentrecordinfo(int DocumentID)
         {
-            var user = User.Identity.Name.Replace("DHRAL\\", "");           
+            var user = User.Identity.Name.Replace("DHRAL\\", "");
             var userinfo = _lookupService.GetUserList(user, 0).Result.FirstOrDefault();
             return await _caseManagement.documentrecordinfo(DocumentID, userinfo.ID);
         }
@@ -104,14 +111,14 @@ namespace ADDICCWebAPIS.Controllers
         //Get/CaseNotesInfo
         [HttpGet("CaseNotesInfo/{ID}")]
         public async Task<IEnumerable<CaseNote>> CaseNotesInfo(int ID)
-        {           
+        {
             return await _caseManagement.GetCasenotesInfo(ID);
         }
         //Post/saveCaseNotes
         [HttpPost("saveCaseNotes")]
         public void saveCaseNotes(CaseInfo Case)
         {
-            var user = User.Identity.Name.Replace("DHRAL\\", "");           
+            var user = User.Identity.Name.Replace("DHRAL\\", "");
             var userinfo = _lookupService.GetUserList(user, 0).Result.FirstOrDefault();
             Case.AuditAssignedUserID = userinfo.ID;
             _caseManagement.SaveCaseNotes(Case);

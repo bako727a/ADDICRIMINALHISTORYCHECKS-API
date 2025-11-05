@@ -1,12 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc.Authorization;
-using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
-using System.Data;
-using CCInterfaces.Contracts;
+﻿using CCInterfaces.Contracts;
 using CCInterfaces.Services;
 using CCRepo.IRepos;
 using CCRepo.Repos;
-
+using Microsoft.AspNetCore.Authentication.Negotiate;
+using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
+using System.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,7 +15,9 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddTransient<IDbConnection>(sp => new SqlConnection(connectionString));
 
-// ==================== DEPENDENCY INJECTION ====================
+// ==================== SERVICES ====================
+builder.Services.AddHttpContextAccessor();
+
 builder.Services.AddScoped<ILookupService, LookupService>();
 builder.Services.AddScoped<ILookupRepo, LookupRepo>();
 builder.Services.AddScoped<IAdminService, AdminService>();
@@ -43,52 +46,88 @@ builder.Services.AddAutoMapper(cfg => cfg.AddMaps(typeof(Program).Assembly));
 // ==================== LOGGING ====================
 builder.Logging.AddConsole();
 
+// ==================== WINDOWS AUTH ====================
+builder.Services.AddAuthentication(NegotiateDefaults.AuthenticationScheme)
+    .AddNegotiate();
+
+builder.Services.AddAuthorization();
+
 // ==================== CORS ====================
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp", policy =>
     {
-        policy.WithOrigins("http://localhost:3000", "http://10.131.82.12:3000")
-              .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials();
+        policy.WithOrigins(
+                "http://localhost:3000",
+                "http://10.131.82.12:3000",
+                "http://dhr99aswtdwb01v:8090"
+            )
+            .SetIsOriginAllowed(_ => true)
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials(); // Required for Windows Auth cookies
     });
 });
 
-// ==================== CONTROLLERS & AUTH ====================
+// ==================== CONTROLLERS ====================
 builder.Services.AddControllers(options =>
 {
-    options.Filters.Add(new AllowAnonymousFilter()); // optional
+    // Optional: use [Authorize] globally if desired
+    // options.Filters.Add(new AuthorizeFilter());
 });
-
-
-
-builder.Services.AddAuthentication(Microsoft.AspNetCore.Server.IISIntegration.IISDefaults.AuthenticationScheme);
-builder.Services.AddAuthorization();
 
 // ==================== SWAGGER ====================
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.AddSecurityDefinition("WindowsAuth", new OpenApiSecurityScheme
+    {
+        Type = SecuritySchemeType.Http,
+        Scheme = "negotiate",
+        Description = "Windows Authentication"
+    });
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "WindowsAuth"
+                }
+            },
+            new string[] {}
+        }
+    });
+});
 
+// ==================== BUILD APP ====================
 var app = builder.Build();
 
-// ==================== MIDDLEWARE ====================
-app.UseCors("AllowReactApp"); // must be before Auth
+app.UseHttpsRedirection();
 
+// CORS must be before Auth
+app.UseCors("AllowReactApp");
+
+// Swagger should come after Auth if you want it secured
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "ADDICCWebAPIS v1");
-    c.RoutePrefix = "swagger"; // navigate to https://localhost:44321/swagger
+    c.RoutePrefix = "swagger";
 });
-
-app.UseHttpsRedirection();
 
 app.Use(async (context, next) =>
 {
-    if (context.Request.Method == "OPTIONS")
+    if (context.Request.Method == HttpMethods.Options)
     {
+        // ✅ Skip auth challenge for CORS preflight
         context.Response.StatusCode = 200;
+        context.Response.Headers.Append("Access-Control-Allow-Origin", context.Request.Headers["Origin"]);
+        context.Response.Headers.Append("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+        context.Response.Headers.Append("Access-Control-Allow-Headers", "Content-Type, Authorization");
+        context.Response.Headers.Append("Access-Control-Allow-Credentials", "true");
         await context.Response.CompleteAsync();
     }
     else
@@ -97,12 +136,12 @@ app.Use(async (context, next) =>
     }
 });
 
-// 5. HTTPS & Auth middleware
-app.UseHttpsRedirection();
+
+
+// Authentication & Authorization
 app.UseAuthentication();
 app.UseAuthorization();
 
-// 6. Map controllers
 app.MapControllers();
 
 app.Run();
