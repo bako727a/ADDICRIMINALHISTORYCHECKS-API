@@ -25,13 +25,20 @@ namespace ADDICCWebAPIS.Controllers
             _lookupService = lookupService;
             _securityService = securityService;
         }
+        [HttpOptions]
+        [Route("{*path}")]
+        public IActionResult Options()
+        {
+            return Ok();
+        }
         //Post/Search
+        [Authorize]
         [HttpPost]
         [Route("casemanagementsearch")]
         public async Task<GridResult<AdvanceSearchViewModel>> casemanagementsearch([FromBody] CaseManagementSearchCriteria criteria)
         {
-            string windowsUser = Environment.UserName;
-            var UserInformation = _lookupService.GetUserList(windowsUser, 0).Result.FirstOrDefault();
+            var windowsUser =  HttpContext.User.Identity;
+            var UserInformation = _lookupService.GetUserList(windowsUser.Name.Replace("DHRAL\\",""), 0).Result.FirstOrDefault();
             criteria.isConfidentialAllowed = UserInformation.RoleID == 3 || UserInformation.RoleID == 5 || UserInformation.RoleID == 6 || UserInformation.RoleID == 7;
             var UserCredentials = _securityService.GetUserEntitlements(UserInformation.ID);
             if (UserInformation.RoleID == (int)SecurityEnums.CountyDirector || UserInformation.RoleID == (int)SecurityEnums.CountySupervisor || UserInformation.RoleID == (int)SecurityEnums.CountyWorker)

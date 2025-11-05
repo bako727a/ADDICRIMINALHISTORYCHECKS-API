@@ -1,29 +1,29 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using CCInterfaces.Contracts;
+﻿using CCInterfaces.Contracts;
 using CCModels.GenericModelElements;
 using CCModels.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ADDICCWebAPIS.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    
     public class LookUpController : ControllerBase
     {
         private readonly ILookupService _lookupService;
-        public LookUpController(ILookupService lookupService)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public LookUpController(ILookupService lookupService, IHttpContextAccessor httpContextAccessor)
         {
             _lookupService = lookupService;
+            _httpContextAccessor = httpContextAccessor;
         }
         //Get/getIdentityName
         [HttpGet("getIdentityName")]
-        [AllowAnonymous]
         public async Task<IEnumerable<Users>> getIdentityName()
-        {
-            string windowsUser = Environment.UserName;
-            //string domainUser = $"{Environment.UserDomainName}\\{Environment.UserName
-            string domainUser = User?.Identity?.Name;
-            return await _lookupService.GetUserList(windowsUser, 0);
+        {       
+            var windowsUser = _httpContextAccessor.HttpContext?.User?.Identity; 
+            return await _lookupService.GetUserList(windowsUser.Name.Replace("DHRAL\\",""), 0);
         }
 
         //Get/GetUserInfo
