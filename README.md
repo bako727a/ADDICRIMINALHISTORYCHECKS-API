@@ -1,0 +1,1 @@
+We’re developing the next-generation Alabama DHR Document Imaging Program for the Criminal History Checks domain, using a modern technology stack to improve efficiency, reliability, and user experience.
