@@ -14,22 +14,25 @@ namespace ADDICCWebAPIS.Controllers
         private readonly ILookupService _lookupservice;
         private readonly ISecurityService _securityService;
         private readonly IAdvanceSearchService _advanceSearchService;
-        public CaseDocumentController(ICaseDocumentService documentService, ILookupService lookupservice, ISecurityService securityService, IAdvanceSearchService advanceSearchService)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public CaseDocumentController(ICaseDocumentService documentService, ILookupService lookupservice, ISecurityService securityService, IAdvanceSearchService advanceSearchService, IHttpContextAccessor httpContextAccessor)
         {
             _documentService = documentService;
             _lookupservice = lookupservice;
             _securityService = securityService;
             _advanceSearchService = advanceSearchService;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         // GET: api/CaseDocumentList/        
         [HttpGet("CaseDocumentList/{id}")]
-        public async Task<IEnumerable<CaseDocumentListViewModel>> CaseDocumentList(int id)
+        public async Task<CaseDocumentListViewModel> CaseDocumentList(int id)
         {
+            var windowsUser = _httpContextAccessor.HttpContext?.User?.Identity;
             CaseDocumentListViewModel CDLV = new CaseDocumentListViewModel();
             var CaseDetails = _advanceSearchService.caserecordinfo(id);
             var CaseInfo = CaseDetails.Result.FirstOrDefault();
-            var UserInformation = _lookupservice.GetUserList(User.Identity.Name.Replace("DHRAL\\", ""), 0);
+            var UserInformation = _lookupservice.GetUserList(windowsUser.Name.Replace("DHRAL\\",""), 0);
             var userdetails = UserInformation.Result.FirstOrDefault();
             var UserCredentials = _securityService.GetUserEntitlements(userdetails.ID);
             if (userdetails.RoleID == (int)SecurityEnums.CountyDirector)
@@ -64,24 +67,24 @@ namespace ADDICCWebAPIS.Controllers
         [HttpPost("UpdateDocument")]
         public async Task<CaseDocumentListViewModel> UpdateDocument(CCModels.Models.Document document)
         {
-            var user = User.Identity.Name.Replace("DHRAL\\", "");           
-            var userinfo = _lookupservice.GetUserList(user, 0).Result.FirstOrDefault();
+            var windowsUser = _httpContextAccessor.HttpContext?.User?.Identity;
+            var userinfo = _lookupservice.GetUserList(windowsUser.Name.Replace("DHRAL\\",""), 0).Result.FirstOrDefault();
             document.CreatedBy = userinfo.ID;
             CaseDocumentListViewModel CDLV = new CaseDocumentListViewModel();
             _documentService.UpdateDocument(document);
             int id = document.CaseInfoID.ToInt();
-            return _documentService.DocumentsList(id, CDLV).Result.FirstOrDefault();
+            return _documentService.DocumentsList(id, CDLV).Result;
         }
 
         [HttpPost("CopyDocument")]
         public DocumentViewModel CopyDocument(CCModels.Models.Document document)
         {
             DocumentViewModel CDLV = new DocumentViewModel();
-            var user = User.Identity.Name.Replace("DHRAL\\", "");
+            var windowsUser = _httpContextAccessor.HttpContext?.User?.Identity;
             string casenumber = document.CaseSSN;
             var CaseRecord = _documentService.CaseRecordInfo(casenumber);
             Users userinfo = new Users();
-            userinfo = _lookupservice.GetUserList(user, 0).Result.FirstOrDefault();
+            userinfo = _lookupservice.GetUserList(windowsUser.Name.Replace("DHRAL\\",""), 0).Result.FirstOrDefault();
             document.CreatedBy = userinfo.ID;
             document.CaseInfoID = CaseRecord[0].CaseInfoID;
             if (userinfo.RoleID != 3 && userinfo.RoleID != 4)
@@ -129,8 +132,8 @@ namespace ADDICCWebAPIS.Controllers
         [HttpPost("saveFAJOBSDocumentNotes")]
         public void saveFAJOBSDocumentNotes(CCModels.Models.Document Doc)
         {
-            var user = User.Identity.Name.Replace("DHRAL\\", "");            
-            var userinfo = _lookupservice.GetUserList(user, 0).Result.FirstOrDefault();
+            var windowsUser = _httpContextAccessor.HttpContext?.User?.Identity;
+            var userinfo = _lookupservice.GetUserList(windowsUser.Name.Replace("DHRAL\\",""), 0).Result.FirstOrDefault();
             Doc.UserAssgined = userinfo.ID;
             try
             {

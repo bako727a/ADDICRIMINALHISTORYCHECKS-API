@@ -22,20 +22,23 @@ namespace CCRepo.Repos
             _connection = connection;
             _mapper = mapper;
         }
-        public async Task<IEnumerable<CaseDocumentListViewModel>> GetList(int id, CaseDocumentListViewModel CDLV)
+        public async Task<CaseDocumentListViewModel> GetList(int id, CaseDocumentListViewModel CDLV)
         {
-            List<CaseDocumentListViewModel> list = new List<CaseDocumentListViewModel>();
-            List<Document> Doc = new List<Document>();
-            string documenttypename = "";
-            DateTime CertAccessDateFlag = DateTime.Now;
-            var parameters = new {
-                CaseinfoID = id,
-            };
-            return await _connection.QueryAsync<CaseDocumentListViewModel>(
+            var parameters = new { CaseInfoID = id };
+
+            using (var multi = await _connection.QueryMultipleAsync(
                 "[dbo].[usp_document_list_search]",
                 parameters,
-                commandType: CommandType.StoredProcedure
-            );           
+                commandType: CommandType.StoredProcedure))
+            {
+                var caseInfo = await multi.ReadFirstOrDefaultAsync<CaseDocumentListViewModel>();
+                var documents = await multi.ReadAsync<Document>();
+
+                if (caseInfo != null)
+                    caseInfo.DocumentsList = documents.ToList();
+
+                return caseInfo;
+            }
         }
         public async void UpdateDocument(Document document)
         {

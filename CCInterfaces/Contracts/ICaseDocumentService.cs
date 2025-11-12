@@ -10,7 +10,7 @@ namespace CCInterfaces.Contracts
 {
     public interface ICaseDocumentService
     {
-        Task<IEnumerable<CaseDocumentListViewModel>> DocumentsList(int id, CaseDocumentListViewModel CDLV);
+        Task<CaseDocumentListViewModel> DocumentsList(int id, CaseDocumentListViewModel CDLV);
         void UpdateDocument(Document document);
         DocumentViewModel CopyDocument(Document document);
         List<CaseInfo> CaseRecordInfo(string casenumber);
