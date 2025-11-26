@@ -21,7 +21,8 @@ namespace ADDICCWebAPIS.Controllers
         //Get/getIdentityName
         [HttpGet("getIdentityName")]
         public async Task<IEnumerable<Users>> getIdentityName()
-        {       
+        {
+            var windowsuserid = HttpContext.User.Identity?.Name;
             var windowsUser = _httpContextAccessor.HttpContext?.User?.Identity; 
             return await _lookupService.GetUserList(windowsUser.Name.Replace("DHRAL\\",""), 0);
         }

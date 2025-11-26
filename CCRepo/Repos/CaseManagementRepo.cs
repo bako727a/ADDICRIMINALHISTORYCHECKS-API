@@ -105,6 +105,26 @@ namespace CCRepo.Repos
             ).ToList();
             return CN;
         }
+        public void CaseRegistration(CaseRegistration caseInfo)
+        {
+            CaseRegistration registercase = new CaseRegistration();
+            registercase.CaseNumber = caseInfo.CaseNumber;
+            registercase.CaseStatus = caseInfo.CaseStatus;  
+            registercase.CaseWorkerID = caseInfo.CaseWorkerID;
+            registercase.CountyID = caseInfo.CountyID;
+            registercase.FirstName = caseInfo.FirstName;
+            registercase.LastName = caseInfo.LastName;  
+            registercase.MiddleName = caseInfo.MiddleName;
+            registercase.DateOfBirth = caseInfo.DateOfBirth;
+            registercase.CaseSSN = caseInfo.CaseSSN;
+            
+      
+             _connection.Query<CaseRegistration>(
+                "[dbo].[Case_REGISTRATION]",
+                registercase,
+                commandType: CommandType.StoredProcedure
+                );           
+        }
         public void DeleteDocumentRecordInfo(int DocumentID)
         {
             List<Document> DVM = new List<Document>();   
@@ -138,6 +158,6 @@ namespace CCRepo.Repos
                 },
                 commandType: CommandType.StoredProcedure
             );
-        }
+        }      
     }
 }

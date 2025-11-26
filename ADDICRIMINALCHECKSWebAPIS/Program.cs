@@ -2,8 +2,7 @@
 using CCInterfaces.Services;
 using CCRepo.IRepos;
 using CCRepo.Repos;
-using Microsoft.AspNetCore.Authentication.Negotiate;
-using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.AspNetCore.Server.IISIntegration;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
@@ -47,7 +46,7 @@ builder.Services.AddAutoMapper(cfg => cfg.AddMaps(typeof(Program).Assembly));
 builder.Logging.AddConsole();
 
 // ==================== WINDOWS AUTH ====================
-builder.Services.AddAuthentication(NegotiateDefaults.AuthenticationScheme)
+builder.Services.AddAuthentication(IISDefaults.AuthenticationScheme)
     .AddNegotiate();
 
 builder.Services.AddAuthorization();

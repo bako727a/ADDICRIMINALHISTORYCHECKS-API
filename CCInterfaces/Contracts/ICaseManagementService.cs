@@ -16,5 +16,6 @@ namespace CCInterfaces.Contracts
         void deleterecordinfo(int DocumentID);
         void SaveCaseNotes(CaseInfo Case);
         Task<IEnumerable<CaseNote>> GetCasenotesInfo(int casenotes);
+        void CaseRegistration(CaseRegistration CaseInfo);
     }
 }

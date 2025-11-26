@@ -18,7 +18,7 @@ namespace CCInterfaces.Services
             _repository = repository;
         }
 
-        public async  Task<IEnumerable<CaseDocumentListViewModel>> DocumentsList(int id, CaseDocumentListViewModel CDLV)
+        public async  Task<CaseDocumentListViewModel> DocumentsList(int id, CaseDocumentListViewModel CDLV)
         {
 
             return await _repository.GetList(id, CDLV);

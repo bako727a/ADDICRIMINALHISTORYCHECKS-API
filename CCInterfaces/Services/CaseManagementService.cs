@@ -58,5 +58,10 @@ namespace CCInterfaces.Services
         {
             _repository.DeleteDocumentRecordInfo(DocumentID);
         }
+
+        public void CaseRegistration(CaseRegistration CaseInfo)
+        { 
+          _repository.CaseRegistration(CaseInfo);           
+        }
     }
 }

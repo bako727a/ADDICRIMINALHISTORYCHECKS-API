@@ -24,12 +24,12 @@ namespace ADDICCWebAPIS.Controllers
 
         // GET: api/CaseDocumentList/        
         [HttpGet("CaseDocumentList/{id}")]
-        public async Task<IEnumerable<CaseDocumentListViewModel>> CaseDocumentList(int id)
+        public async Task<CaseDocumentListViewModel> CaseDocumentList(int id)
         {
             CaseDocumentListViewModel CDLV = new CaseDocumentListViewModel();
             var CaseDetails = _advanceSearchService.caserecordinfo(id);
             var CaseInfo = CaseDetails.Result.FirstOrDefault();
-            var UserInformation = _lookupservice.GetUserList(User.Identity.Name.Replace("DHRAL\\", ""), 0);
+            var UserInformation = _lookupservice.GetUserList("bako199a", 0);
             var userdetails = UserInformation.Result.FirstOrDefault();
             var UserCredentials = _securityService.GetUserEntitlements(userdetails.ID);
             if (userdetails.RoleID == (int)SecurityEnums.CountyDirector)
@@ -70,7 +70,7 @@ namespace ADDICCWebAPIS.Controllers
             CaseDocumentListViewModel CDLV = new CaseDocumentListViewModel();
             _documentService.UpdateDocument(document);
             int id = document.CaseInfoID.ToInt();
-            return _documentService.DocumentsList(id, CDLV).Result.FirstOrDefault();
+            return _documentService.DocumentsList(id, CDLV).Result;
         }
 
         [HttpPost("CopyDocument")]

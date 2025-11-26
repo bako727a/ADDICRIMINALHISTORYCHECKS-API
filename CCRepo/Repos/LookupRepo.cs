@@ -28,7 +28,7 @@ namespace CCRepo.Repos
             };
 
             return await _connection.QueryAsync<KeyValue>(
-                "usp_get_lookupvalues",
+                "USP_GET_LOOKUP_VALUES",
                 parameters,
                 commandType: CommandType.StoredProcedure
             );
@@ -56,7 +56,7 @@ namespace CCRepo.Repos
             };
 
             return await _connection.QueryAsync<Users>(
-                "[dbo].[USP_USERS_INFO]",
+                "[dbo].[USP_USER_INFO]",
                 parameters,
                 commandType: CommandType.StoredProcedure
             );
