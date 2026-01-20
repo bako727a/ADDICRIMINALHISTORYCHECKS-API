@@ -41,6 +41,7 @@ namespace CCModels.Models
         public int FAJOBSDocumentNoteCount { get; set; }
         public string FAJOBSDocumentNote { get; set; }
         public bool CertAccessDate { get; set; }
+        public string PDFextractdata { get; set; }
         public string ColorCode
         {
             get

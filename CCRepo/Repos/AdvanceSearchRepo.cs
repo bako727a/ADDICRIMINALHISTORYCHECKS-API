@@ -25,36 +25,33 @@ namespace CCRepo.Repos
 
         public async Task<IEnumerable<AdvanceSearchViewModel>> GetList(CaseAdvanceSearchCriteria criteria)
         {
-            if (criteria.DOB == Convert.ToDateTime("01/01/0001 05:00:00 AM") || criteria.DateOfBirth == Convert.ToDateTime("01/01/0001 12:00:00 AM"))
+            if (criteria.DOB == DateTime.MinValue || criteria.DateOfBirth == DateTime.MinValue)
             {
                 criteria.DOB = null;
             }
-            IEnumerable<AdvanceSearchViewModel> list = new List<AdvanceSearchViewModel>();
-            var parameters = new {
-                Type = criteria.IsUniqueSearch
-                ? "IsUniqueSearch"
-                : (!string.IsNullOrEmpty(criteria.CaseSSN) && criteria.CaseSSN != "string"
-                    ? "CaseNumber"
-                    : (criteria.DocumentNumber.HasValue && criteria.DocumentNumber > 0
-                        ? "DocumentNumber"
-                        : "IsAdvanceSearch")),  
-             LastName = criteria.LastName == "string" ? null : criteria.LastName,
-             FirstName = criteria.FirstName == "string" ? null : criteria.FirstName,
-             CountyID = criteria.CountyID == 0 ? null : criteria.CountyID,             
+
+            var parameters = new
+            {  
+                CaseNumber = string.IsNullOrEmpty(criteria.CaseSSN) ? null : criteria.CaseSSN,
+                DocumentNumber = criteria.DocumentNumber,
+                Criteria = criteria.IsUniqueSearch
+                    ? "IsUniqueSearch"
+                    : (!string.IsNullOrEmpty(criteria.CaseSSN)
+                        ? "CaseNumber"
+                        : criteria.DocumentNumber.HasValue
+                            ? "DocumentNumber"
+                            : "IsAdvanceSearch")
             };
-            await _connection.QueryAsync<AdvanceSearchViewModel>(
-                "[dbo].[USP_AdvancedSearch]",
-                parameters,
-                commandType: CommandType.StoredProcedure
-            ).ContinueWith(task =>
-            {
-                if (task.Exception == null)
-                {
-                    list = task.Result.ToList();
-                }
-            });      
+
+            var list = await _connection.QueryAsync<AdvanceSearchViewModel>(
+                        "dbo.USP_AdvancedSearch",
+                        parameters,
+                        commandType: CommandType.StoredProcedure
+                    );
+
             return list;
         }
+
 
         public async Task<IEnumerable<AdvanceSearchViewModel>> GetImportSearchList(CaseAdvanceSearchCriteria criteria)
         {

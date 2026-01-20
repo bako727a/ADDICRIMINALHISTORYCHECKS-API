@@ -36,7 +36,7 @@ namespace CCModels.Models
         public string CountyName { get; set; }
         public string DocumentNumber { get; set; }
         public Boolean fullCalendarDate { get; set; }
-
+        public string PdfExtractData { get; set; }
         public string ResultMessage { get; set; }
     }
 }

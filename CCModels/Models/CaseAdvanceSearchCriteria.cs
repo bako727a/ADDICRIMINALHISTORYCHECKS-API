@@ -34,5 +34,6 @@ namespace CCModels.Models
         public int? userCountyId { get; set; }
         public bool isConfidentialAllowed { get; set; }
         public bool isAudit { get; set; }
+        public string Criteria { get; set; }
     }
 }

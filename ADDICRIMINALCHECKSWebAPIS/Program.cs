@@ -118,22 +118,32 @@ app.UseSwaggerUI(c =>
     c.RoutePrefix = "swagger";
 });
 
+//app.Use(async (context, next) =>
+//{
+//    if (context.Request.Method == HttpMethods.Options)
+//    {
+//        // ✅ Skip auth challenge for CORS preflight
+//        context.Response.StatusCode = 200;
+//        context.Response.Headers.Append("Access-Control-Allow-Origin", context.Request.Headers["Origin"]);
+//        context.Response.Headers.Append("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+//        context.Response.Headers.Append("Access-Control-Allow-Headers", "Content-Type, Authorization");
+//        context.Response.Headers.Append("Access-Control-Allow-Credentials", "true");
+//        await context.Response.CompleteAsync();
+//    }
+//    else
+//    {
+//        await next();
+//    }
+//});
 app.Use(async (context, next) =>
 {
     if (context.Request.Method == HttpMethods.Options)
     {
-        // ✅ Skip auth challenge for CORS preflight
-        context.Response.StatusCode = 200;
-        context.Response.Headers.Append("Access-Control-Allow-Origin", context.Request.Headers["Origin"]);
-        context.Response.Headers.Append("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-        context.Response.Headers.Append("Access-Control-Allow-Headers", "Content-Type, Authorization");
-        context.Response.Headers.Append("Access-Control-Allow-Credentials", "true");
-        await context.Response.CompleteAsync();
+        context.Response.StatusCode = StatusCodes.Status204NoContent;
+        return;
     }
-    else
-    {
-        await next();
-    }
+
+    await next();
 });
 
 

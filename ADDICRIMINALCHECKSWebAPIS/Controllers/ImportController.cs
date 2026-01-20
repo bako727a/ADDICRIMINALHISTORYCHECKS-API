@@ -1,11 +1,17 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.Extensions.Hosting.Internal;
-using System.Net.Http.Headers;
-using CCInterfaces.Contracts;
+﻿using CCInterfaces.Contracts;
 using CCModels.Helper;
 using CCModels.Models;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting.Internal;
+using OpenAI;
+using OpenAI.Chat;
+using System.Net.Http.Headers;
+using System.Net.Mail;
+using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace ADDICCWebAPIS.Controllers
 {
@@ -15,14 +21,16 @@ namespace ADDICCWebAPIS.Controllers
     {
         private readonly IAdvanceSearchService _searchService;
         private readonly IImportService _importService;
+        private readonly ICaseManagementService _caseManagement;
         private IConfiguration _configuration { get; }
         public readonly ILookupService _lookupService;
-        public ImportController(IConfiguration configuration, ILookupService lookupService, IImportService importService, IAdvanceSearchService SeachService)
+        public ImportController(IConfiguration configuration, ILookupService lookupService, IImportService importService, IAdvanceSearchService SeachService, ICaseManagementService caseManagement)
         {
             _importService = importService;
             _configuration = configuration;
             _lookupService = lookupService;
             _searchService = SeachService;
+            _caseManagement = caseManagement;
         }
         //Get/GetSourceFiles
         [HttpGet("GetSourceFiles")]
@@ -177,16 +185,18 @@ namespace ADDICCWebAPIS.Controllers
         }
         //Post/ImportDocuments
         [HttpPost("ImportDocuments")]
-        public int ImportDocuments(DocumentViewModel document)
+        public int ImportDocuments([FromForm] DocumentViewModel document)
         {
             int result = 0;
             if (document.ReviewPeriod != null)
             {
                 document.ReviewDate = document.ReviewPeriod.Value.ToShortDateString();
             }
-            DocumentViewModel ImportedDocument = new DocumentViewModel();
+           // DocumentViewModel ImportedDocument = new DocumentViewModel();
             try
             {
+                IFormFile file = ConvertFileToiFormfile(document.FilePath);
+                PdfExtractedDto fileinfo = UploadPDF(file);
                 document.Username = User.Identity.Name.Replace("DHRAL\\", "");
                 var user = _lookupService.GetUserList(document.Username, 0).Result.FirstOrDefault();
                 var CaseInfo = _searchService.caserecordinfo(document.CaseInfoID).Result.FirstOrDefault();
@@ -194,6 +204,7 @@ namespace ADDICCWebAPIS.Controllers
                 document.CountyName = CaseInfo.CountyName;
                 document.CreatedBy = user.ID;
                 document.LastUpdatedBy = user.ID;
+                document.PdfExtractData = fileinfo.ExtractedText;
                 result = _importService.ImportDocuments(document);
             }
             catch (Exception ex)
@@ -202,6 +213,19 @@ namespace ADDICCWebAPIS.Controllers
             }
             return result;
         }
+        [NonAction]
+        public IFormFile ConvertFileToiFormfile(string FilePath)
+        {
+            var fileInfo = new FileInfo(FilePath);
+            var fileStream = new FileStream(FilePath, FileMode.Open, FileAccess.Read);
+            return new FormFile(fileStream, 0, fileStream.Length, fileInfo.Name, fileInfo.Name)
+            {
+                Headers = new HeaderDictionary(),
+                ContentType = "application/pdf"
+            };
+        }
+
+
         //Get/RotateFile
         [HttpGet("RotateFile")]
         public PdfViewModel RotateFile(string pdfname)
@@ -234,6 +258,8 @@ namespace ADDICCWebAPIS.Controllers
             pdf.Name = outputFile;
             return pdf;
         }
+
+
 
         //POST/UploadFile
         [HttpPost("UploadFile"), DisableRequestSizeLimit]
@@ -274,6 +300,59 @@ namespace ADDICCWebAPIS.Controllers
             {
                 throw ex;
             }
+        }
+
+        [HttpPost("upload")]
+        public PdfExtractedDto UploadPDF(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return null;
+            }
+
+            using var memoryStream = new MemoryStream();
+            file.CopyToAsync(memoryStream);
+
+            memoryStream.Position = 0;
+
+            var text = "";
+
+            using (var pdf = UglyToad.PdfPig.PdfDocument.Open(memoryStream))
+            {
+                foreach (var page in pdf.GetPages())
+                {
+                    text += page.Text + "\n";
+                }
+            }
+
+            //Save the data into the database!!
+            var pdfDoc = new PdfExtractedDto
+            {
+                FileName = file.FileName,
+                ExtractedText = text
+            };
+            return pdfDoc;
+        }
+
+        [HttpGet("download/{id}")]
+        public IActionResult DownloadPdf(int id)
+        {
+            var user = User.Identity.Name.Replace("DHRAL\\", "");
+            var userinfo = _lookupService.GetUserList(user, 0).Result.FirstOrDefault();
+            var pdfDoc = _caseManagement.documentrecordinfo(id, userinfo.ID).Result;
+            //var pdfDoc = await _dbContext.PdfDocuments.FindAsync(id);
+            if (pdfDoc == null) return NotFound();
+
+            using var memoryStream = new MemoryStream();
+            var writer = new iText.Kernel.Pdf.PdfWriter(memoryStream);
+            var pdf = new iText.Kernel.Pdf.PdfDocument(writer);
+            var document = new iText.Layout.Document(pdf);
+
+            document.Add(new iText.Layout.Element.Paragraph(pdfDoc.PDFextractdata));
+            document.Close();
+
+            memoryStream.Position = 0;
+            return File(memoryStream.ToArray(), "application/pdf", pdfDoc.FilePath);
         }
     }
 }

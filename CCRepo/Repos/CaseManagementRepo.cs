@@ -42,23 +42,23 @@ namespace CCRepo.Repos
                 DocumentID = DocumentID,
             };
             DVM = await _connection.QueryFirstOrDefaultAsync<Document>(
-                "[dbo].[USP_DOCUMENT_RECORD_SEARCH]",
+                "[dbo].[USP_DOCUMENT_RECORD_INFO]",
                 parameters,
                 commandType: CommandType.StoredProcedure
             );   
-            await _connection.ExecuteAsync(
-                "[dbo].[USP_Audit_Logs_information]",
-                new
-                {
-                    CaseInfoID = DVM.CaseInfoID,
-                    CreatedBy = userid,
-                    DocumentTypeID = DVM.DocumentTypeID,
-                    DocumentSubTypeID = DVM.DocumentSubTypeID,
-                    DocumentID = DVM.DocumentID,
-                    Action = "View Document"
-                },
-                commandType: CommandType.StoredProcedure
-            );
+            //await _connection.ExecuteAsync(
+            //    "[dbo].[USP_Audit_Logs_information]",
+            //    new
+            //    {
+            //        CaseInfoID = DVM.CaseInfoID,
+            //        CreatedBy = userid,
+            //        DocumentTypeID = DVM.DocumentTypeID,
+            //        DocumentSubTypeID = DVM.DocumentSubTypeID,
+            //        DocumentID = DVM.DocumentID,
+            //        Action = "View Document"
+            //    },
+            //    commandType: CommandType.StoredProcedure
+            //);
             return DVM;
         }
         public async Task<CaseInfo> GetCaseRecordInfo(int CaseID)

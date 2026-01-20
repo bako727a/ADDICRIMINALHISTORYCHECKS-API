@@ -81,9 +81,10 @@ namespace ADDICCWebAPIS.Controllers
         [HttpGet("documentrecordinfo/{DocumentID}")]
         public async Task<Document> documentrecordinfo(int DocumentID)
         {
-            var user = User.Identity.Name.Replace("DHRAL\\", "");
-            var userinfo = _lookupService.GetUserList(user, 0).Result.FirstOrDefault();
-            return await _caseManagement.documentrecordinfo(DocumentID, userinfo.ID);
+            // var user = User.Identity.Name.Replace("DHRAL\\", "");
+            // var userinfo = _lookupService.GetUserList(user, 0).Result.FirstOrDefault();
+            // return await _caseManagement.documentrecordinfo(DocumentID, userinfo.ID);
+            return await _caseManagement.documentrecordinfo(DocumentID, 1);
         }
         //Get/deletedocument
         [HttpGet("deletedocument/{DocumentID}")]

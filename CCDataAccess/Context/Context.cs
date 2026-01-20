@@ -8,6 +8,6 @@ namespace CCDataAccess.Context
         {
 
         }
-
+        
     }
 }

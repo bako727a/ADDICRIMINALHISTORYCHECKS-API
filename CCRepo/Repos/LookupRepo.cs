@@ -18,17 +18,17 @@ namespace CCRepo.Repos
             _connection = connection;
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
-        public async Task<IEnumerable<KeyValue>> GetList(string type, int CountyID)
+        public async Task<IEnumerable<KeyValue>> GetList(string type, int ID)
         {          
-            List<KeyValue> list = new List<KeyValue>();
+            List<KeyValue> list = new List<KeyValue>();           
             var parameters = new
             {
                 Type = type,
-                CountyID = CountyID
+                ID = ID
             };
 
             return await _connection.QueryAsync<KeyValue>(
-                "usp_get_lookupvalues",
+                "USP_GET_LOOKUP_VALUES",
                 parameters,
                 commandType: CommandType.StoredProcedure
             );

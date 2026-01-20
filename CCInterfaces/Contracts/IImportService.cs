@@ -10,5 +10,6 @@ namespace CCInterfaces.Contracts
     public interface IImportService
     {
         int ImportDocuments(DocumentViewModel document);
+
     }
 }

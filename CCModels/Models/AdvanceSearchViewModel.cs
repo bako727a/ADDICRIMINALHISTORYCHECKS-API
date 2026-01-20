@@ -30,5 +30,6 @@ namespace CCModels.Models
         public string UserCredentials { get; set; }
         public bool IsImport { get; set; }
         public int CaseNotesCount { get; set; }
+        public string CaseFullName { get; set; }
     }
 }

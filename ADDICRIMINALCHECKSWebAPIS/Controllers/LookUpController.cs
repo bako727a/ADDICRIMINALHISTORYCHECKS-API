@@ -8,7 +8,7 @@ namespace ADDICCWebAPIS.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-
+    [AllowAnonymous]
     public class LookUpController : ControllerBase
     {
         private readonly ILookupService _lookupService;
@@ -22,8 +22,9 @@ namespace ADDICCWebAPIS.Controllers
         [HttpGet("getIdentityName")]
         public async Task<IEnumerable<Users>> getIdentityName()
         {
-            var windowsUser = _httpContextAccessor.HttpContext?.User?.Identity;
-            return await _lookupService.GetUserList(windowsUser.Name.Replace("DHRAL\\", ""), 0);
+            //var windowsUser = _httpContextAccessor.HttpContext?.User?.Identity;
+            //return await _lookupService.GetUserList(windowsUser.Name.Replace("DHRAL\\", ""), 0);
+            return await _lookupService.GetUserList("bako199a", 0);
         }
 
         //Get/GetUserInfo
@@ -107,7 +108,20 @@ namespace ADDICCWebAPIS.Controllers
         [HttpGet("DocumentSubTypebyType/{typeId}")]
         public async Task<IEnumerable<KeyValue>> GetDocumentSubTypebyTypeId(int typeId)
         {
-            return await _lookupService.GetDocSubTypeList(typeId);
+            return await _lookupService.GetList("DocumentSubtypeByType",typeId);
         }
+        [HttpGet("pdf")]
+        public IActionResult GetPdf([FromQuery] string filePath)
+        {
+            if (string.IsNullOrEmpty(filePath))
+                return BadRequest();
+
+            if (!System.IO.File.Exists(filePath))
+                return NotFound();
+
+            return PhysicalFile(filePath, "application/pdf");
+        }
+
+
     }
 }

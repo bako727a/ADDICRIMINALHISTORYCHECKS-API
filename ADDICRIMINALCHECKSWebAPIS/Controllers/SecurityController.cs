@@ -1,12 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using CCInterfaces.Contracts;
+﻿using CCInterfaces.Contracts;
 using CCModels.Helper;
 using CCModels.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ADDICCWebAPIS.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [AllowAnonymous]
     public class SecurityController : ControllerBase
     {
         private readonly ISecurityService _securityService;
