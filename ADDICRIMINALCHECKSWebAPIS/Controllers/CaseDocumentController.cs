@@ -30,38 +30,39 @@ namespace ADDICCWebAPIS.Controllers
         {
             var windowsUser = _httpContextAccessor.HttpContext?.User?.Identity;
             CaseDocumentListViewModel CDLV = new CaseDocumentListViewModel();
-            var CaseDetails = _advanceSearchService.caserecordinfo(id);
-            var CaseInfo = CaseDetails.Result.FirstOrDefault();
-            var UserInformation = _lookupservice.GetUserList(windowsUser.Name.Replace("DHRAL\\",""), 0);
-            var userdetails = UserInformation.Result.FirstOrDefault();
-            var UserCredentials = _securityService.GetUserEntitlements(userdetails.ID);
-            if (userdetails.RoleID == (int)SecurityEnums.CountyDirector)
-            {
-                if (userdetails.CountyID == CaseInfo.CountyID)
-                {
-                    CDLV.UserCredentials = _securityService.GetUserEntitlements(userdetails.ID);
-                }
-                else
-                {
-                    CDLV.UserCredentials = _securityService.GetUserEntitlements(userdetails.ID).Replace("COPY,", "").Replace("EDIT", "").Replace("DELETE", "");
-                }
-            }
-            else if (userdetails.RoleID == (int)SecurityEnums.CountySupervisor || userdetails.RoleID == (int)SecurityEnums.CountyWorker)
-            {
-                if (userdetails.CountyID == CaseInfo.CountyID)
-                {
-                    CDLV.UserCredentials = _securityService.GetUserEntitlements(userdetails.ID);
-                }
-                else
-                {
-                    CDLV.UserCredentials = _securityService.GetUserEntitlements(userdetails.ID).Replace("EDIT", "").Replace("DELETE", "");
-                }
-            }
-            else
-            {
-                CDLV.UserCredentials = _securityService.GetUserEntitlements(userdetails.ID);
-            }
             return await _documentService.DocumentsList(id, CDLV);
+            //var CaseDetails = _advanceSearchService.caserecordinfo(id);
+            //var CaseInfo = CaseDetails.Result.FirstOrDefault();
+            //var UserInformation = _lookupservice.GetUserList(windowsUser.Name.Replace("DHRAL\\",""), 0);
+            //var userdetails = UserInformation.Result.FirstOrDefault();
+            //var UserCredentials = _securityService.GetUserEntitlements(userdetails.ID);
+            //if (userdetails.RoleID == (int)SecurityEnums.CountyDirector)
+            //{
+            //    if (userdetails.CountyID == CaseInfo.CountyID)
+            //    {
+            //        CDLV.UserCredentials = _securityService.GetUserEntitlements(userdetails.ID);
+            //    }
+            //    else
+            //    {
+            //        CDLV.UserCredentials = _securityService.GetUserEntitlements(userdetails.ID).Replace("COPY,", "").Replace("EDIT", "").Replace("DELETE", "");
+            //    }
+            //}
+            //else if (userdetails.RoleID == (int)SecurityEnums.CountySupervisor || userdetails.RoleID == (int)SecurityEnums.CountyWorker)
+            //{
+            //    if (userdetails.CountyID == CaseInfo.CountyID)
+            //    {
+            //        CDLV.UserCredentials = _securityService.GetUserEntitlements(userdetails.ID);
+            //    }
+            //    else
+            //    {
+            //        CDLV.UserCredentials = _securityService.GetUserEntitlements(userdetails.ID).Replace("EDIT", "").Replace("DELETE", "");
+            //    }
+            //}
+            //else
+            //{
+            //    CDLV.UserCredentials = _securityService.GetUserEntitlements(userdetails.ID);
+            //}
+            //return await _documentService.DocumentsList(id, CDLV);
         }
         //Post/UpdateDocument
         [HttpPost("UpdateDocument")]

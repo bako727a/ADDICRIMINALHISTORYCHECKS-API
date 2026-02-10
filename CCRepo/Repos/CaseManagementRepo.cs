@@ -139,5 +139,28 @@ namespace CCRepo.Repos
                 commandType: CommandType.StoredProcedure
             );
         }
+        public void CaseRegistration(CaseRegistration caseRegistration)
+        {
+            var parameters = new CaseRegistration
+            {
+            CaseSSN = caseRegistration.CaseSSN,
+            FirstName = caseRegistration.FirstName,
+            LastName = caseRegistration.LastName,
+            CaseStatus = caseRegistration.CaseStatus,
+            DateOfBirth = caseRegistration.DateOfBirth,
+            SecurityRoleID = caseRegistration.SecurityRoleID,
+            CountyID = caseRegistration.CountyID,
+            };
+            try
+            {
+                _connection.Execute("[dbo].[Case_Registration]",
+                    parameters,
+                    commandType: CommandType.StoredProcedure);
+            }
+            catch (Exception ex)
+            {
+                
+            }
+        }
     }
 }

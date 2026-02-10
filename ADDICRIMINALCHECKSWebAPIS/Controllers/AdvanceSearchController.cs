@@ -5,12 +5,12 @@ using CCModels.enums;
 using CCModels.Helper;
 using CCModels.Models;
 using Azure.Identity;
-
+using System.Web;
 namespace ADDICCWebAPIS.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize]
+    [Authorize]
     public class AdvancedSearchController : ControllerBase
     {
         private readonly IAdvanceSearchService _advancedSearch;
@@ -75,6 +75,7 @@ namespace ADDICCWebAPIS.Controllers
             criteria.DateOfBirth = Convert.ToDateTime(criteria.DOB);
             criteria.DateOfBirth = criteria.DateOfBirth.ToLocalTime();
             criteria.LoginUserRoleID = Convert.ToInt32(UserInformation.FirstOrDefault().RoleID);
+            var res = _advancedSearch.AdvancedSearch(criteria).Result;
             return _advancedSearch.AdvancedSearch(criteria).Result;
         }
         // POST: api/importsearch/

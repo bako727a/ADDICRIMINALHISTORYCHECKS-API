@@ -8,7 +8,7 @@ namespace ADDICCWebAPIS.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [AllowAnonymous]
+    [Authorize]
     public class LookUpController : ControllerBase
     {
         private readonly ILookupService _lookupService;
@@ -22,9 +22,9 @@ namespace ADDICCWebAPIS.Controllers
         [HttpGet("getIdentityName")]
         public async Task<IEnumerable<Users>> getIdentityName()
         {
-            //var windowsUser = _httpContextAccessor.HttpContext?.User?.Identity;
-            //return await _lookupService.GetUserList(windowsUser.Name.Replace("DHRAL\\", ""), 0);
-            return await _lookupService.GetUserList("bako199a", 0);
+            var windowsUser = _httpContextAccessor.HttpContext?.User?.Identity;
+            return await _lookupService.GetUserList(windowsUser.Name.Replace("DHRAL\\", ""), 0);
+            //return await _lookupService.GetUserList("bako199a", 0);
         }
 
         //Get/GetUserInfo
@@ -121,7 +121,11 @@ namespace ADDICCWebAPIS.Controllers
 
             return PhysicalFile(filePath, "application/pdf");
         }
-
+        [HttpGet("SecurityRoles")]
+        public async Task<IEnumerable<KeyValue>> GetSecurityRoles()
+        {
+            return await _lookupService.GetList("SecurityRoles", 0);
+        }
 
     }
 }

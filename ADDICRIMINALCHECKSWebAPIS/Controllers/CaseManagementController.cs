@@ -124,5 +124,19 @@ namespace ADDICCWebAPIS.Controllers
             Case.AuditAssignedUserID = userinfo.ID;
             _caseManagement.SaveCaseNotes(Case);
         }
+        //Post/Case registration 
+        [HttpPost("CaseRegistration")]
+        public Boolean CaseRegistration(CaseRegistration CaseRegistration)
+        {
+            try
+            {
+                _caseManagement.CaseRegistration(CaseRegistration);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }            
+        }
     }
 }

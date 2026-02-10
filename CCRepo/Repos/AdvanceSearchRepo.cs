@@ -23,6 +23,7 @@ namespace CCRepo.Repos
             _mapper = mapper;
         }
 
+      
         public async Task<IEnumerable<AdvanceSearchViewModel>> GetList(CaseAdvanceSearchCriteria criteria)
         {
             if (criteria.DOB == DateTime.MinValue || criteria.DateOfBirth == DateTime.MinValue)
@@ -30,24 +31,28 @@ namespace CCRepo.Repos
                 criteria.DOB = null;
             }
 
+            bool hasCaseNumber = !string.IsNullOrWhiteSpace(criteria.CaseSSN);
+            bool hasDocumentNumber = criteria.DocumentNumber.HasValue;
+
             var parameters = new
-            {  
-                CaseNumber = string.IsNullOrEmpty(criteria.CaseSSN) ? null : criteria.CaseSSN,
-                DocumentNumber = criteria.DocumentNumber,
-                Criteria = criteria.IsUniqueSearch
-                    ? "IsUniqueSearch"
-                    : (!string.IsNullOrEmpty(criteria.CaseSSN)
-                        ? "CaseNumber"
-                        : criteria.DocumentNumber.HasValue
-                            ? "DocumentNumber"
-                            : "IsAdvanceSearch")
-            };
+            {
+                CaseNumber = hasCaseNumber ? criteria.CaseSSN : null,
+                DocumentNumber = hasDocumentNumber ? criteria.DocumentNumber : null,
+                CaseStatus = criteria.CaseStatus,
+                CountyID = criteria.CountyID,
+                FirstName = criteria.FirstName,
+                LastName= criteria.LastName,
+                Criteria = hasCaseNumber || hasDocumentNumber
+                            ? "IsUniqueSearch"
+                            : "IsAdvanceSearch"
+         
+        };
 
             var list = await _connection.QueryAsync<AdvanceSearchViewModel>(
-                        "dbo.USP_AdvancedSearch",
-                        parameters,
-                        commandType: CommandType.StoredProcedure
-                    );
+                "dbo.USP_AdvancedSearch",
+                parameters,
+                commandType: CommandType.StoredProcedure
+            );
 
             return list;
         }
