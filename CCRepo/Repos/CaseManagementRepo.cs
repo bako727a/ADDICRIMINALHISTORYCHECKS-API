@@ -20,16 +20,18 @@ namespace CCRepo.Repos
             IEnumerable<AdvanceSearchViewModel> list = new List<AdvanceSearchViewModel>();           
             var parameters = new
             {
-                Type = criteria.CaseSSN != "" && criteria.CaseSSN != null ? "SSN" : criteria.CountyID > 0 && criteria.CountyID != null ? "County" : "Both",
-                CountyID = criteria.CountyID,
                 CaseSSN = criteria.CaseSSN,
-                CaseWorkerID = criteria.CaseWorkerID,
-                UserCountyID = criteria.userCountyId,
-                LoginUserRoleID = criteria.LoginUserRoleID,
-                isConfidentialAllowed = criteria.isConfidentialAllowed ? 'Y' : 'N'
+                CountyID = criteria.CountyID
+                //Type = criteria.CaseSSN != "" && criteria.CaseSSN != null ? "SSN" : criteria.CountyID > 0 && criteria.CountyID != null ? "County" : "Both",
+                //CountyID = criteria.CountyID,
+                //CaseSSN = criteria.CaseSSN,
+                //CaseWorkerID = criteria.CaseWorkerID,
+                //UserCountyID = criteria.userCountyId,
+                //LoginUserRoleID = criteria.LoginUserRoleID,
+                //isConfidentialAllowed = criteria.isConfidentialAllowed ? 'Y' : 'N'
             };
             return await _connection.QueryAsync<AdvanceSearchViewModel>(
-                "[dbo].[USP_IBM_CASE_MANAGEMENT_SEARCH]",
+                "[dbo].[USP_CASE_MANAGEMENT_SEARCH]",
                 parameters,
                 commandType: CommandType.StoredProcedure
             );           
@@ -45,20 +47,7 @@ namespace CCRepo.Repos
                 "[dbo].[USP_DOCUMENT_RECORD_INFO]",
                 parameters,
                 commandType: CommandType.StoredProcedure
-            );   
-            //await _connection.ExecuteAsync(
-            //    "[dbo].[USP_Audit_Logs_information]",
-            //    new
-            //    {
-            //        CaseInfoID = DVM.CaseInfoID,
-            //        CreatedBy = userid,
-            //        DocumentTypeID = DVM.DocumentTypeID,
-            //        DocumentSubTypeID = DVM.DocumentSubTypeID,
-            //        DocumentID = DVM.DocumentID,
-            //        Action = "View Document"
-            //    },
-            //    commandType: CommandType.StoredProcedure
-            //);
+            );             
             return DVM;
         }
         public async Task<CaseInfo> GetCaseRecordInfo(int CaseID)

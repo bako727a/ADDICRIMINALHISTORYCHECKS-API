@@ -24,8 +24,8 @@ namespace CCRepo.Repos
         {           
             IEnumerable<Entitlement> uem = new List<Entitlement>();
             var parameters = new
-            {                
-                userId = userId,
+            {
+                USERID = userId,
             };
 
             uem = _connection.Query<Entitlement>(

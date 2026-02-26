@@ -25,35 +25,29 @@ namespace CCRepo.Repos
 
       
         public async Task<IEnumerable<AdvanceSearchViewModel>> GetList(CaseAdvanceSearchCriteria criteria)
-        {
-            if (criteria.DOB == DateTime.MinValue || criteria.DateOfBirth == DateTime.MinValue)
-            {
-                criteria.DOB = null;
-            }
+        {           
 
-            bool hasCaseNumber = !string.IsNullOrWhiteSpace(criteria.CaseSSN);
-            bool hasDocumentNumber = criteria.DocumentNumber.HasValue;
+            if (criteria.DateOfBirth == DateTime.MinValue)
+            {
+                criteria.DateOfBirth = null;
+            }
 
             var parameters = new
             {
-                CaseNumber = hasCaseNumber ? criteria.CaseSSN : null,
-                DocumentNumber = hasDocumentNumber ? criteria.DocumentNumber : null,
-                CaseStatus = criteria.CaseStatus,
-                CountyID = criteria.CountyID,
-                FirstName = criteria.FirstName,
-                LastName= criteria.LastName,
-                Criteria = hasCaseNumber || hasDocumentNumber
-                            ? "IsUniqueSearch"
-                            : "IsAdvanceSearch"
-         
-        };
+                CaseNumber = string.IsNullOrWhiteSpace(criteria.CaseSSN) ? null : criteria.CaseSSN,
+                DocumentNumber = criteria.DocumentNumber == 0 ? null : criteria.DocumentNumber,
+                CaseStatus = string.IsNullOrWhiteSpace(criteria.CaseStatus) ? null : criteria.CaseStatus,
+                CountyID = criteria.CountyID == 0 ? null : criteria.CountyID,
+                FirstName = string.IsNullOrWhiteSpace(criteria.FirstName) ? null : criteria.FirstName,
+                LastName = string.IsNullOrWhiteSpace(criteria.LastName) ? null : criteria.LastName,
+                DOB = criteria.DateOfBirth
+            };
 
             var list = await _connection.QueryAsync<AdvanceSearchViewModel>(
                 "dbo.USP_AdvancedSearch",
                 parameters,
                 commandType: CommandType.StoredProcedure
             );
-
             return list;
         }
 

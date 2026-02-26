@@ -73,7 +73,7 @@ namespace ADDICCWebAPIS.Controllers
                 criteria.LoginUserRoleID = Convert.ToInt32(UserInformation.FirstOrDefault().RoleID);
             }
             criteria.DateOfBirth = Convert.ToDateTime(criteria.DOB);
-            criteria.DateOfBirth = criteria.DateOfBirth.ToLocalTime();
+            criteria.DateOfBirth = criteria.DateOfBirth;
             criteria.LoginUserRoleID = Convert.ToInt32(UserInformation.FirstOrDefault().RoleID);
             var res = _advancedSearch.AdvancedSearch(criteria).Result;
             return _advancedSearch.AdvancedSearch(criteria).Result;

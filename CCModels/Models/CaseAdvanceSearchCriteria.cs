@@ -9,12 +9,12 @@ namespace CCModels.Models
 {
     public class CaseAdvanceSearchCriteria
     {
-        public string CaseSSN { get; set; }
+        public string? CaseSSN { get; set; }
         //public int? CaseNumber { get; set; }
         public int? DocumentNumber { get; set; }
         public string? LastName { get; set; }
         public string? FirstName { get; set; }
-        public DateTime DateOfBirth { get; set; }
+        public DateTime? DateOfBirth { get; set; }
         public DateTime? DOB { get; set; }
         public string? CaseStatus { get; set; }
         public int? CaseWorkerID { get; set; }
@@ -30,10 +30,10 @@ namespace CCModels.Models
         public bool IsUniqueSearch { get; set; }
         public int LoginUserID { get; set; }
         public int? LoginUserRoleID { get; set; }
-        public string UserCredentials { get; set; }
+        public string? UserCredentials { get; set; }
         public int? userCountyId { get; set; }
         public bool isConfidentialAllowed { get; set; }
         public bool isAudit { get; set; }
-        public string Criteria { get; set; }
+       // public string Criteria { get; set; }
     }
 }
