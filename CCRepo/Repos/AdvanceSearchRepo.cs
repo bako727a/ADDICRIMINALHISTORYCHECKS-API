@@ -34,7 +34,8 @@ namespace CCRepo.Repos
 
             var parameters = new
             {
-                CaseNumber = string.IsNullOrWhiteSpace(criteria.CaseSSN) ? null : criteria.CaseSSN,
+                TCN = criteria.TCN == 0 ? null : criteria.TCN,
+                CaseSSN = string.IsNullOrWhiteSpace(criteria.CaseSSN) ? null : criteria.CaseSSN,
                 DocumentNumber = criteria.DocumentNumber == 0 ? null : criteria.DocumentNumber,
                 CaseStatus = string.IsNullOrWhiteSpace(criteria.CaseStatus) ? null : criteria.CaseStatus,
                 CountyID = criteria.CountyID == 0 ? null : criteria.CountyID,

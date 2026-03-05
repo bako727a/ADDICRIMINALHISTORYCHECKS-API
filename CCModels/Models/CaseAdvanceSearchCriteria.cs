@@ -10,7 +10,8 @@ namespace CCModels.Models
     public class CaseAdvanceSearchCriteria
     {
         public string? CaseSSN { get; set; }
-        //public int? CaseNumber { get; set; }
+
+        public int? TCN { get; set; }
         public int? DocumentNumber { get; set; }
         public string? LastName { get; set; }
         public string? FirstName { get; set; }
